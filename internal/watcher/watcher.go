@@ -456,6 +456,22 @@ func (w *WorkspaceWatcher) matchesPattern(path string, pattern protocol.GlobPatt
 
 	path = filepath.ToSlash(path)
 
+	// Special handling for wildcard patterns like "**/*"
+	if patternText == "**/*" {
+		return true
+	}
+
+	// Special handling for wildcard patterns like "**/*.ext"
+	if strings.HasPrefix(patternText, "**/") {
+		if strings.HasPrefix(strings.TrimPrefix(patternText, "**/"), "*.") {
+			// Extension pattern like **/*.go
+			ext := strings.TrimPrefix(strings.TrimPrefix(patternText, "**/"), "*")
+			return strings.HasSuffix(path, ext)
+		} else {
+			return true
+		}
+	}
+
 	// For simple patterns without base path
 	if basePath == "" {
 		// Check if the pattern matches the full path or just the file extension

@@ -62,9 +62,14 @@ func parseConfig() (*config, error) {
 	// Get remaining args after -- as LSP arguments
 	cfg.lspArgs = flag.Args()
 
-	// Validate workspace directory
+	// Default workspace to current working directory
 	if cfg.workspaceDir == "" {
-		return nil, fmt.Errorf("workspace directory is required")
+		wd, err := os.Getwd()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get current working directory: %v", err)
+		}
+		cfg.workspaceDir = wd
+		coreLogger.Info("No --workspace specified, using current directory: %s", cfg.workspaceDir)
 	}
 
 	workspaceDir, err := filepath.Abs(cfg.workspaceDir)
@@ -77,13 +82,21 @@ func parseConfig() (*config, error) {
 		return nil, fmt.Errorf("workspace directory does not exist: %s", cfg.workspaceDir)
 	}
 
-	// Validate LSP command
+	// Auto-detect LSP server if not specified
 	if cfg.lspCommand == "" {
-		return nil, fmt.Errorf("LSP command is required")
+		detected, err := lsp.DetectServer(cfg.workspaceDir)
+		if err != nil {
+			return nil, err
+		}
+		cfg.lspCommand = detected.Command
+		if len(cfg.lspArgs) == 0 && len(detected.Args) > 0 {
+			cfg.lspArgs = detected.Args
+		}
+		coreLogger.Info("Auto-detected LSP server: %s %v", cfg.lspCommand, cfg.lspArgs)
 	}
 
 	if _, err := exec.LookPath(cfg.lspCommand); err != nil {
-		return nil, fmt.Errorf("LSP command not found: %s", cfg.lspCommand)
+		return nil, fmt.Errorf("LSP command %q not found in PATH. Install it or use --lsp to specify a different server", cfg.lspCommand)
 	}
 
 	return cfg, nil
