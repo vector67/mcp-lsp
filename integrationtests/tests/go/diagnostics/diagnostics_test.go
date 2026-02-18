@@ -43,16 +43,18 @@ func TestDiagnostics(t *testing.T) {
 		// Get a test suite with code that contains errors
 		suite := internal.GetTestSuite(t)
 
-		// Wait for diagnostics to be generated
-		time.Sleep(2 * time.Second)
-
-		ctx, cancel := context.WithTimeout(suite.Context, 5*time.Second)
+		ctx, cancel := context.WithTimeout(suite.Context, 10*time.Second)
 		defer cancel()
 
 		filePath := filepath.Join(suite.WorkspaceDir, "main.go")
+		start := time.Now()
 		result, err := tools.GetDiagnosticsForFile(ctx, suite.Client, filePath, 2, true)
+		elapsed := time.Since(start)
 		if err != nil {
 			t.Fatalf("GetDiagnosticsForFile failed: %v", err)
+		}
+		if elapsed > 4*time.Second {
+			t.Fatalf("GetDiagnosticsForFile took too long: %v (expected <4s)", elapsed)
 		}
 
 		// Verify we have diagnostics about unreachable code
@@ -73,11 +75,7 @@ func TestDiagnostics(t *testing.T) {
 		// Get a test suite with clean code
 		suite := internal.GetTestSuite(t)
 
-		// Wait for initial diagnostics to be generated
-		time.Sleep(2 * time.Second)
-
-		// Verify consumer.go is clean initially
-		ctx, cancel := context.WithTimeout(suite.Context, 5*time.Second)
+		ctx, cancel := context.WithTimeout(suite.Context, 30*time.Second)
 		defer cancel()
 
 		// Ensure both helper.go and consumer.go are open in the LSP
@@ -93,9 +91,6 @@ func TestDiagnostics(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to open consumer.go: %v", err)
 		}
-
-		// Wait for files to be processed
-		time.Sleep(2 * time.Second)
 
 		// Get initial diagnostics for consumer.go
 		result, err := tools.GetDiagnosticsForFile(ctx, suite.Client, consumerPath, 2, true)
@@ -147,9 +142,6 @@ func HelperFunction(value int) string {
 			t.Fatalf("Failed to send DidChangeWatchedFiles: %v", err)
 		}
 
-		// Wait for LSP to process the change
-		time.Sleep(3 * time.Second)
-
 		// Force reopen the consumer file to ensure LSP reevaluates it
 		err = suite.Client.CloseFile(ctx, consumerPath)
 		if err != nil {
@@ -161,10 +153,8 @@ func HelperFunction(value int) string {
 			t.Fatalf("Failed to reopen consumer.go: %v", err)
 		}
 
-		// Wait for diagnostics to be generated
-		time.Sleep(3 * time.Second)
-
 		// Check diagnostics again on consumer file - should now have an error
+		// WaitForDiagnostics inside GetDiagnosticsForFile handles waiting
 		result, err = tools.GetDiagnosticsForFile(ctx, suite.Client, consumerPath, 2, true)
 		if err != nil {
 			t.Fatalf("GetDiagnosticsForFile failed after dependency change: %v", err)

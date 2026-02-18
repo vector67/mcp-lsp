@@ -124,5 +124,8 @@ func HandleDiagnostics(client *Client, params json.RawMessage) {
 	client.diagnostics[diagParams.URI] = diagParams.Diagnostics
 	client.diagnosticsMu.Unlock()
 
+	// Signal any goroutines waiting for diagnostics on this URI
+	client.notifyDiagnosticWaiters(diagParams.URI)
+
 	lspLogger.Info("Received diagnostics for %s: %d items", diagParams.URI, len(diagParams.Diagnostics))
 }
