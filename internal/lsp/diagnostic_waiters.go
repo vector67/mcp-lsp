@@ -4,8 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/logging"
+	"github.com/vector67/mcp-language-server/internal/protocol"
 )
+
+var diagLogger = logging.NewLogger(logging.LSP)
 
 // diagnosticSettleTime is how long to wait after each notification for
 // additional diagnostics. LSP servers like gopls send diagnostics in
@@ -19,6 +22,10 @@ func (c *Client) notifyDiagnosticWaiters(uri protocol.DocumentUri) {
 	c.diagnosticWaitersMu.Lock()
 	defer c.diagnosticWaitersMu.Unlock()
 
+	waiterCount := len(c.diagnosticWaiters[uri])
+	if waiterCount > 0 {
+		diagLogger.Debug("notifyDiagnosticWaiters: closing %d waiter(s) for %s", waiterCount, uri)
+	}
 	for _, ch := range c.diagnosticWaiters[uri] {
 		close(ch)
 	}
@@ -30,6 +37,8 @@ func (c *Client) notifyDiagnosticWaiters(uri protocol.DocumentUri) {
 // like gopls send diagnostics incrementally: type-check first, then
 // analysis). Returns on context cancellation or timeout.
 func (c *Client) WaitForDiagnostics(ctx context.Context, uri protocol.DocumentUri, timeout time.Duration) ([]protocol.Diagnostic, error) {
+	diagLogger.Debug("WaitForDiagnostics: waiting for first notification for %s (timeout=%v)", uri, timeout)
+	start := time.Now()
 	ch := make(chan struct{})
 
 	// 1. Register waiter
@@ -43,12 +52,18 @@ func (c *Client) WaitForDiagnostics(ctx context.Context, uri protocol.DocumentUr
 	// 3. Wait for first notification
 	select {
 	case <-ch:
-		// First notification received — settle to catch additional rounds
-		return c.settleDiagnostics(ctx, uri)
+		diagLogger.Debug("WaitForDiagnostics: first notification received for %s after %v, entering settle", uri, time.Since(start))
+		diags, err := c.settleDiagnostics(ctx, uri)
+		diagLogger.Debug("WaitForDiagnostics: settled for %s after %v total, returning %d diagnostics", uri, time.Since(start), len(diags))
+		return diags, err
 	case <-ctx.Done():
-		return c.GetFileDiagnostics(uri), ctx.Err()
+		diags := c.GetFileDiagnostics(uri)
+		diagLogger.Debug("WaitForDiagnostics: context cancelled for %s after %v, returning %d cached diagnostics", uri, time.Since(start), len(diags))
+		return diags, ctx.Err()
 	case <-time.After(timeout):
-		return c.GetFileDiagnostics(uri), nil
+		diags := c.GetFileDiagnostics(uri)
+		diagLogger.Debug("WaitForDiagnostics: timed out for %s after %v, returning %d cached diagnostics", uri, time.Since(start), len(diags))
+		return diags, nil
 	}
 }
 
@@ -60,6 +75,8 @@ func (c *Client) settleDiagnostics(ctx context.Context, uri protocol.DocumentUri
 	timer := time.NewTimer(diagnosticSettleTime)
 	defer timer.Stop()
 
+	rounds := 0
+	start := time.Now()
 	for {
 		ch := make(chan struct{})
 		c.diagnosticWaitersMu.Lock()
@@ -68,6 +85,8 @@ func (c *Client) settleDiagnostics(ctx context.Context, uri protocol.DocumentUri
 
 		select {
 		case <-ch:
+			rounds++
+			diagLogger.Debug("settleDiagnostics: round %d for %s (elapsed=%v), resetting settle timer", rounds, uri, time.Since(start))
 			// New notification — reset settle timer
 			if !timer.Stop() {
 				<-timer.C
@@ -75,9 +94,11 @@ func (c *Client) settleDiagnostics(ctx context.Context, uri protocol.DocumentUri
 			timer.Reset(diagnosticSettleTime)
 			continue
 		case <-timer.C:
+			diagLogger.Debug("settleDiagnostics: settled for %s after %d rounds, %v elapsed", uri, rounds, time.Since(start))
 			c.removeWaiter(uri, ch)
 			return c.GetFileDiagnostics(uri), nil
 		case <-ctx.Done():
+			diagLogger.Debug("settleDiagnostics: context cancelled for %s after %d rounds, %v elapsed", uri, rounds, time.Since(start))
 			c.removeWaiter(uri, ch)
 			return c.GetFileDiagnostics(uri), ctx.Err()
 		}
