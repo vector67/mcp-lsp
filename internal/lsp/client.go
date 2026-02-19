@@ -13,7 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/protocol"
 )
 
 type Client struct {
@@ -329,17 +329,21 @@ func (c *Client) OpenFile(ctx context.Context, filepath string) error {
 func (c *Client) NotifyChange(ctx context.Context, filepath string) error {
 	uri := fmt.Sprintf("file://%s", filepath)
 
+	c.openFilesMu.Lock()
+	fileInfo, isOpen := c.openFiles[uri]
+	if !isOpen {
+		c.openFilesMu.Unlock()
+		lspLogger.Debug("NotifyChange: skipping unopened file %s", filepath)
+		return nil
+	}
+	c.openFilesMu.Unlock()
+
 	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return fmt.Errorf("error reading file: %w", err)
 	}
 
 	c.openFilesMu.Lock()
-	fileInfo, isOpen := c.openFiles[uri]
-	if !isOpen {
-		c.openFilesMu.Unlock()
-		return fmt.Errorf("cannot notify change for unopened file: %s", filepath)
-	}
 
 	// Increment version
 	fileInfo.Version++

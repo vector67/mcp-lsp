@@ -6,9 +6,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
-	"github.com/isaacphi/mcp-language-server/internal/utilities"
+	"github.com/vector67/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/utilities"
 )
 
 // RenameSymbol renames a symbol (variable, function, class, etc.) at the specified position
@@ -115,6 +115,13 @@ func RenameSymbol(ctx context.Context, client *lsp.Client, filePath string, line
 	// Apply the workspace edit to files:workspaceEdit
 	if err := utilities.ApplyWorkspaceEdit(workspaceEdit); err != nil {
 		return "", fmt.Errorf("failed to apply changes: %v", err)
+	}
+
+	// Notify the language server that file contents changed on disk
+	for _, path := range AffectedFiles(workspaceEdit) {
+		if err := client.NotifyChange(ctx, path); err != nil {
+			toolsLogger.Warn("Failed to notify language server of change to %s: %v", path, err)
+		}
 	}
 
 	if fileCount == 0 || changeCount == 0 {

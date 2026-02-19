@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
-	"github.com/isaacphi/mcp-language-server/internal/utilities"
+	"github.com/vector67/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/utilities"
 )
 
 type TextEdit struct {
@@ -80,6 +80,11 @@ func ApplyTextEdits(ctx context.Context, client *lsp.Client, filePath string, ed
 
 	if err := utilities.ApplyWorkspaceEdit(edit); err != nil {
 		return "", fmt.Errorf("failed to apply text edits: %v", err)
+	}
+
+	// Notify the language server that the file contents changed on disk
+	if err := client.NotifyChange(ctx, filePath); err != nil {
+		toolsLogger.Warn("Failed to notify language server of change to %s: %v", filePath, err)
 	}
 
 	return fmt.Sprintf("Successfully applied text edits. %d lines removed, %d lines added.", linesRemovedSorted, linesAddedSorted), nil
