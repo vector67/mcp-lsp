@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/protocol"
 )
 
 // GetDiagnosticsForFile retrieves diagnostics for a specific file from the language server

@@ -2,7 +2,7 @@
 
 ## Date: 2026-02-17
 
-Detailed analysis of all notable forks of isaacphi/mcp-language-server.
+Detailed analysis of all notable forks of vector67/mcp-language-server.
 
 ---
 

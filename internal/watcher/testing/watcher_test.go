@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/isaacphi/mcp-language-server/internal/logging"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
-	"github.com/isaacphi/mcp-language-server/internal/watcher"
+	"github.com/vector67/mcp-language-server/internal/logging"
+	"github.com/vector67/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/watcher"
 )
 
 func init() {

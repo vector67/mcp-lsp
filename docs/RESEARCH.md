@@ -18,7 +18,7 @@ Five projects were evaluated:
 
 | Project | Stars | Language | Last Human Commit | Status |
 |---------|-------|----------|-------------------|--------|
-| [isaacphi/mcp-language-server](https://github.com/isaacphi/mcp-language-server) | 1,447 | Go | May 2025 | Unmaintained (author confirmed) |
+| [vector67/mcp-language-server](https://github.com/vector67/mcp-language-server) | 1,447 | Go | May 2025 | Unmaintained (author confirmed) |
 | [virtuald/mcp-language-server](https://github.com/virtuald/mcp-language-server) | 26 | Go | Jul 2025 | Best fork, also slowing |
 | [jonrad/lsp-mcp](https://github.com/jonrad/lsp-mcp) | 165 | TypeScript | Mar 2025 | POC, dormant |
 | [sminnee/lsp-mcp](https://github.com/sminnee/lsp-mcp) | 6 | TypeScript | Sep 2025 | Abandoned prototype |
@@ -28,9 +28,9 @@ Five projects were evaluated:
 
 ## 3. Detailed Project Analyses
 
-### 3.1 isaacphi/mcp-language-server (upstream)
+### 3.1 vector67/mcp-language-server (upstream)
 
-**Repository:** https://github.com/isaacphi/mcp-language-server
+**Repository:** https://github.com/vector67/mcp-language-server
 **Author:** Isaac Phi
 **Stars:** 1,447 | **Forks:** 114 | **Contributors:** 4 (isaacphi: 98 commits, +3 minor)
 **License:** BSD 3-Clause
@@ -81,7 +81,7 @@ He invited community forks and offered merge access to interested Go developers.
 #### Installation
 
 ```bash
-go install github.com/isaacphi/mcp-language-server@latest
+go install github.com/vector67/mcp-language-server@latest
 ```
 
 Configuration for Claude Code (`.claude/settings.json`):
@@ -276,7 +276,7 @@ Interesting proof-of-concept with unique features (extract_function, move_functi
 
 **Repository:** https://github.com/t3ta/mcp-language-server
 **Stars:** 3 | **Language:** Go
-**Fork of:** isaacphi/mcp-language-server
+**Fork of:** vector67/mcp-language-server
 **Total development:** 2 days (Mar 26-28, 2025)
 **Self-described:** "Pre-beta Quality"
 

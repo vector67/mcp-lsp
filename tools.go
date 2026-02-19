@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/isaacphi/mcp-language-server/internal/tools"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/vector67/mcp-language-server/internal/tools"
 )
 
 func (s *mcpServer) registerTools() error {

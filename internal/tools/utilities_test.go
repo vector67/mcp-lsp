@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
 	"github.com/stretchr/testify/assert"
+	"github.com/vector67/mcp-language-server/internal/protocol"
 )
 
 // Save original ReadFile function

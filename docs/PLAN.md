@@ -4,7 +4,7 @@
 
 ## Goal
 
-Fork virtuald/mcp-language-server and apply all viable open PRs from isaacphi/mcp-language-server to create the most complete community fork.
+Fork virtuald/mcp-language-server and apply all viable open PRs from vector67/mcp-language-server to create the most complete community fork.
 
 ## Starting Point
 

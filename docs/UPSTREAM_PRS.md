@@ -1,4 +1,4 @@
-# isaacphi/mcp-language-server — Open PR Inventory
+# vector67/mcp-language-server — Open PR Inventory
 
 ## Date: 2026-02-17
 
@@ -161,7 +161,7 @@ Full inventory of all 20 open PRs on the upstream repository, with analysis for 
 - **Opened:** 2025-08-11
 - **Size:** +130 / -0 across 3 files (1 commit)
 - **Reviews:** None
-- **Description:** Adds Nix flake with default package and dev shell. Enables `nix run github:isaacphi/mcp-language-server`.
+- **Description:** Adds Nix flake with default package and dev shell. Enables `nix run github:vector67/mcp-language-server`.
 - **Verdict:** APPLY (Phase 1) — All new files, zero conflict.
 
 ---

@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/isaacphi/mcp-language-server/internal/logging"
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
-	"github.com/isaacphi/mcp-language-server/internal/watcher"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/vector67/mcp-language-server/internal/logging"
+	"github.com/vector67/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/watcher"
 )
 
 // Create a logger for the core component

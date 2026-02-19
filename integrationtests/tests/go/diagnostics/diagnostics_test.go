@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/isaacphi/mcp-language-server/integrationtests/tests/common"
-	"github.com/isaacphi/mcp-language-server/integrationtests/tests/go/internal"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
-	"github.com/isaacphi/mcp-language-server/internal/tools"
+	"github.com/vector67/mcp-language-server/integrationtests/tests/common"
+	"github.com/vector67/mcp-language-server/integrationtests/tests/go/internal"
+	"github.com/vector67/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/tools"
 )
 
 // TestDiagnostics tests diagnostics functionality with the Go language server

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/lsp"
 )
 
 func TestDetectServer(t *testing.T) {
