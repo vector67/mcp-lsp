@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/isaacphi/mcp-language-server/internal/logging"
-	"github.com/isaacphi/mcp-language-server/internal/lsp"
-	"github.com/isaacphi/mcp-language-server/internal/protocol"
+	"github.com/vector67/mcp-language-server/internal/logging"
+	"github.com/vector67/mcp-language-server/internal/lsp"
+	"github.com/vector67/mcp-language-server/internal/protocol"
 )
 
 // Create a logger for the watcher component
@@ -462,7 +462,8 @@ func (w *WorkspaceWatcher) matchesPattern(path string, pattern protocol.GlobPatt
 	}
 
 	// Special handling for wildcard patterns like "**/*.ext"
-	if strings.HasPrefix(patternText, "**/") {
+	// Skip this shortcut for braced patterns like "**/*.{go,mod}" — let matchesGlob handle those
+	if strings.HasPrefix(patternText, "**/") && !strings.Contains(patternText, "{") {
 		if strings.HasPrefix(strings.TrimPrefix(patternText, "**/"), "*.") {
 			// Extension pattern like **/*.go
 			ext := strings.TrimPrefix(strings.TrimPrefix(patternText, "**/"), "*")
